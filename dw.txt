@@ -1,0 +1,10 @@
+Project setup
+dynamic_wallet/
+├── app/
+│   ├── __init__.py
+│   ├── db.py             ← DB connection setup
+│   ├── models.py         ← SQLAlchemy models
+│   └── crud.py           ← Create/read/update/delete functions
+├── main.py               ← For running scripts/tests or starting API later
+├── .env                  ← DB connection string
+└── requirements.txt
