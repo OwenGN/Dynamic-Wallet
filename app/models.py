@@ -26,12 +26,11 @@ class Category(Base):
 
 class Transaction(Base):
     __tablename__ = "transactions"
-
     id = Column(Integer, primary_key=True, index=True)
     account_id = Column(Integer, ForeignKey("accounts.id"), nullable=False)
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
     date = Column(Date, nullable=False)
     amount = Column(Float, nullable=False)
-    category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
     description = Column(String)
 
     account = relationship("Account", back_populates="transactions")
