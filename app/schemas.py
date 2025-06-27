@@ -44,3 +44,36 @@ class Transaction(TransactionBase):
 
     class Config:
         from_attributes = True
+
+class LoanBase(BaseModel):
+    account_id: int
+    borrower_name: str
+    loan_type: str  # e.g. "given", "received"
+    amount: float
+    interest_rate: Optional[float] = None
+    start_date: date
+    due_date: Optional[date] = None
+    status: str  # e.g. "active", "repaid", "defaulted"
+    notes: Optional[str] = None
+
+class LoanCreate(LoanBase):
+    pass
+
+class Loan(LoanBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+class LoanUpdate(BaseModel):
+    borrower_name: Optional[str] = None
+    loan_type: Optional[str] = None
+    amount: Optional[float] = None
+    interest_rate: Optional[float] = None
+    start_date: Optional[date] = None
+    due_date: Optional[date] = None
+    status: Optional[str] = None
+    notes: Optional[str] = None
+
+    class Config:
+        from_attributes = True

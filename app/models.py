@@ -11,7 +11,7 @@ class Account(Base):
     currency = Column(String, nullable=False)
 
     transactions = relationship("Transaction", back_populates="account")
-    loans = relationship("Loan", back_populates="account")
+    loans = relationship("Loan", back_populates="account", cascade="all, delete")
 
 
 class Category(Base):
