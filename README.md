@@ -1,5 +1,5 @@
 # Dynamic-Wallet
-A cloud-based dynamic wallet for managing personal finances, built using Python, SQL and deployed with AWS.
+A cloud-based dynamic wallet for managing personal finances, built using Python, SQL and to be deployed with GCP.
 
 # Project Overview
 
