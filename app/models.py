@@ -1,5 +1,9 @@
-from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Date, DateTime, Enum, ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy.types import Enum
+from datetime import datetime
+import enum
 from app.db import Base
 
 class Account(Base):
@@ -35,6 +39,7 @@ class Transaction(Base):
 
     account = relationship("Account", back_populates="transactions")
     category = relationship("Category", back_populates="transactions")
+    goal_id = Column(Integer, ForeignKey("goals.id"), nullable=True)
 
 
 class Loan(Base):
@@ -52,3 +57,19 @@ class Loan(Base):
     notes = Column(String)
 
     account = relationship("Account", back_populates="loans")
+
+class GoalType(enum.Enum):
+    SAVINGS = "savings"
+    DEBT = "debt"
+
+class Goal(Base):
+    __tablename__ = "goals"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    target_amount = Column(Float, nullable=False)
+    target_date = Column(Date, nullable=False)
+    current_amount = Column(Float, default=0.0)
+    type = Column(Enum(GoalType), nullable=False)
+
+    created_at = Column(Date, default=datetime.utcnow)

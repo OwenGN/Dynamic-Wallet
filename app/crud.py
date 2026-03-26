@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from app import models, schemas
+from datetime import datetime
 
 def create_account(db: Session, account: schemas.AccountCreate):
     db_account = models.Account(**account.dict())
@@ -89,4 +90,22 @@ def update_loan(db: Session, loan_id: int, loan: schemas.LoanUpdate):
         db.commit()
         db.refresh(db_loan)
     return db_loan
-    
+
+def create_goal(db: Session, goal: schemas.GoalCreate) -> models.Goal:
+    db_goal = models.Goal(
+        name=goal.name,
+        type=goal.type,
+        target_amount=goal.target_amount,
+        target_date=goal.target_date,
+        created_at=datetime.utcnow()
+    )
+    db.add(db_goal)
+    db.commit()
+    db.refresh(db_goal)
+    return db_goal
+
+def get_goals(db: Session) -> list[models.Goal]:
+    return db.query(models.Goal).all()
+
+def get_goal(db: Session, goal_id: int):
+    return db.query(models.Goal).filter(models.Goal.id == goal_id).first()

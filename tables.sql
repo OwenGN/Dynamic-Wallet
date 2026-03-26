@@ -29,4 +29,14 @@ CREATE TABLE IF NOT EXISTS Loans(
     status TEXT NOT NULL,
     notes TEXT
 );
+CREATE TABLE IF NOT EXISTS Goals(
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    target_amount FLOAT NOT NULL,
+    goalType ENUM('savings', 'debt'),
+    deadline DATE,
+    priority INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
     

@@ -18,8 +18,8 @@ def create_category(category: schemas.CategoryCreate, db: Session = Depends(get_
     return crud.create_category(db=db, category=category)
 
 @router.get('/', response_model=list[schemas.Category])
-def read_categories(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return crud.get_categories(db=db, skip=skip, limit=limit)
+def read_categories(db: Session = Depends(get_db)):
+    return crud.get_categories(db=db)
 
 @router.delete("/{category_id}", response_model=schemas.Category)
 def delete_category(category_id: int, db: Session = Depends(get_db)):

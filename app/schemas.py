@@ -1,6 +1,7 @@
-from pydantic import BaseModel
-from datetime import date
-from typing import List, Optional
+from pydantic import BaseModel, Field
+from datetime import datetime, date
+from typing import List, Optional, Literal
+from enum import Enum
 
 class AccountBase(BaseModel):
     name: str
@@ -77,3 +78,24 @@ class LoanUpdate(BaseModel):
 
     class Config:
         from_attributes = True
+
+class GoalType(str, Enum):
+    SAVINGS = "savings"
+    DEBT = "debt"
+
+class GoalBase(BaseModel):
+    name: str
+    type: GoalType
+    target_amount: float
+    target_date: date
+
+class GoalCreate(GoalBase):
+    pass
+
+class Goal(GoalBase):
+    id: int
+    current_amount: float
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
