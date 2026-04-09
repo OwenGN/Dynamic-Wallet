@@ -21,6 +21,11 @@ app.include_router(loans.router, prefix="/loans", tags=["Loans"])
 app.include_router(goals.router, prefix="/goals", tags=["Goals"])
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 
-if __name__ == "__main__":
+@app.on_event("startup")
+async def startup():
     Base.metadata.create_all(bind=engine)
-    print("Database tables created successfully.")
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
