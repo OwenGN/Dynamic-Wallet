@@ -1,10 +1,11 @@
-import { useState, ChangeEvent, FormEvent } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { useEffect } from 'react';
+import { useAuthStore } from '@/lib/authStore';
+import apiCall from '@/lib/api';
 
 interface TransactionFormData {
   account_id: string;
@@ -15,26 +16,33 @@ interface TransactionFormData {
 }
 
 export default function TransactionForm() {
+  const { token } = useAuthStore();
   const [accounts, setAccounts] = useState<{ id: number; name: string }[]>([]);
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchOptions = async () => {
-      const [accountsRes, categoriesRes] = await Promise.all([
-        fetch("http://127.0.0.1:8000/accounts/"),
-        fetch("http://127.0.0.1:8000/categories/")
-      ]);
-      if (accountsRes.ok) setAccounts(await accountsRes.json());
-      if (categoriesRes.ok) setCategories(await categoriesRes.json());
+      try {
+        const [accountsRes, categoriesRes] = await Promise.all([
+          apiCall('/accounts/', {}, token),
+          apiCall('/categories/', {}, token),
+        ]);
+        setAccounts(accountsRes);
+        setCategories(categoriesRes);
+      } catch (error) {
+        toast.error('Failed to load accounts and categories');
+      }
     };
-    fetchOptions();
-  }, []);
+    if (token) {
+      fetchOptions();
+    }
+  }, [token]);
 
-  
   const [formData, setFormData] = useState<TransactionFormData>({
     account_id: '',
     category_id: '',
-    date: '',
+    date: new Date().toISOString().split('T')[0],
     amount: '',
     description: '',
   });
@@ -46,81 +54,122 @@ export default function TransactionForm() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    try {
-      const res = await fetch("http://127.0.0.1:8000/transactions/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          amount: parseFloat(formData.amount),
-          category_id: parseInt(formData.category_id),
-          account_id: parseInt(formData.account_id),
-        }),
-      });
+    setIsLoading(true);
 
-      if (res.ok) {
-        toast.success("Transaction added successfully!");
-        setFormData({ account_id: '', category_id: '', date: '', amount: '', description: '' });
-      } else {
-        toast.error("Failed to add transaction. Please check your input.");
-      }
-    } catch (error) {
-      toast.error("Server error.");
+    try {
+      await apiCall(
+        '/transactions/',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            ...formData,
+            amount: parseFloat(formData.amount),
+            category_id: formData.category_id ? parseInt(formData.category_id) : null,
+            account_id: parseInt(formData.account_id),
+          }),
+        },
+        token
+      );
+
+      toast.success('Transaction added successfully!');
+      setFormData({
+        account_id: '',
+        category_id: '',
+        date: new Date().toISOString().split('T')[0],
+        amount: '',
+        description: '',
+      });
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to add transaction');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-  <Card className="max-w-xl mx-auto mt-8">
-    <CardContent>
-      <form onSubmit={handleSubmit} className="grid gap-4">
+    <form onSubmit={handleSubmit} className="grid gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label>Account</Label>
+          <Label htmlFor="account_id">Account</Label>
           <select
-            className="text-black bg-white"
+            id="account_id"
             name="account_id"
             value={formData.account_id}
             onChange={handleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white text-gray-900"
             required
           >
             <option value="">Select an account</option>
-            {accounts.map(acc => (
-              <option key={acc.id} value={acc.id}>{acc.name}</option>
+            {accounts.map((acc) => (
+              <option key={acc.id} value={acc.id}>
+                {acc.name}
+              </option>
             ))}
           </select>
         </div>
+
         <div>
-          <Label>Category</Label>
+          <Label htmlFor="category_id">Category</Label>
           <select
-            className="text-black bg-white"
+            id="category_id"
             name="category_id"
             value={formData.category_id}
             onChange={handleChange}
-            required
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white text-gray-900"
           >
             <option value="">Select a category</option>
-            {categories.map(cat => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
             ))}
           </select>
         </div>
-        <div>
-          <Label>Date</Label>
-          <Input className="text-black bg-white" type="date" name="date" value={formData.date} onChange={handleChange} required />
-        </div>
-        <div>
-          <Label>Amount</Label>
-          <Input className="text-black bg-white" type="number" step="0.01" name="amount" value={formData.amount} onChange={handleChange} required />
-        </div>
-        <div>
-          <Label>Description</Label>
-          <Input className="text-black bg-white" name="description" value={formData.description} onChange={handleChange} />
-        </div>
-        <Button type="submit">Submit</Button>
-      </form>
-    </CardContent>
-  </Card>
-);
+      </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="date">Date</Label>
+          <Input
+            id="date"
+            type="date"
+            name="date"
+            value={formData.date}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="amount">Amount</Label>
+          <Input
+            id="amount"
+            type="number"
+            step="0.01"
+            name="amount"
+            placeholder="0.00"
+            value={formData.amount}
+            onChange={handleChange}
+            required
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="description">Description</Label>
+        <Input
+          id="description"
+          name="description"
+          placeholder="Transaction description"
+          value={formData.description}
+          onChange={handleChange}
+        />
+      </div>
+
+      <Button type="submit" disabled={isLoading} className="w-full">
+        {isLoading ? 'Adding...' : 'Add Transaction'}
+      </Button>
+    </form>
+  );
 }
+
