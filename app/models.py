@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Date, DateTime, Enum, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Date, DateTime, Enum, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.types import Enum
@@ -26,6 +26,15 @@ class Category(Base):
     type = Column(String, nullable=False)
 
     transactions = relationship("Transaction", back_populates="category")
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
 
 
 class Transaction(Base):

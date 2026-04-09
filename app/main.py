@@ -2,7 +2,7 @@ from app.db import Base, engine
 from app import models
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import accounts, transactions, categories, loans, goals
+from app.routes import accounts, transactions, categories, loans, goals, auth
 
 app = FastAPI(title='Dynamic Wallet API')
 
@@ -19,6 +19,7 @@ app.include_router(transactions.router, prefix="/transactions", tags=["Transacti
 app.include_router(categories.router, prefix="/categories", tags=["Categories"])
 app.include_router(loans.router, prefix="/loans", tags=["Loans"])
 app.include_router(goals.router, prefix="/goals", tags=["Goals"])
+app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 
 if __name__ == "__main__":
     Base.metadata.create_all(bind=engine)
