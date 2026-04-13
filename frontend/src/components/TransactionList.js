@@ -1,9 +1,7 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '@/lib/authStore';
 import apiCall from '@/lib/api';
 export default function TransactionList() {
-    const { token } = useAuthStore();
     const [transactions, setTransactions] = useState([]);
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [accounts, setAccounts] = useState([]);
@@ -19,9 +17,9 @@ export default function TransactionList() {
         const fetchData = async () => {
             try {
                 const [transRes, accRes, catRes] = await Promise.all([
-                    apiCall('/transactions/', {}, token),
-                    apiCall('/accounts/', {}, token),
-                    apiCall('/categories/', {}, token),
+                    apiCall('/transactions/', {}),
+                    apiCall('/accounts/', {}),
+                    apiCall('/categories/', {}),
                 ]);
                 setTransactions(transRes);
                 setFilteredTransactions(transRes);
@@ -35,10 +33,8 @@ export default function TransactionList() {
                 setIsLoading(false);
             }
         };
-        if (token) {
-            fetchData();
-        }
-    }, [token]);
+        fetchData();
+    }, []);
     useEffect(() => {
         let filtered = transactions;
         if (filters.account) {

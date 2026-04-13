@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuthStore } from '@/lib/authStore';
 import apiCall from '@/lib/api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
@@ -12,7 +11,6 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
-  const { token } = useAuthStore();
   const [stats, setStats] = useState<DashboardStats>({
     totalTransactions: 0,
     totalBalance: 0,
@@ -26,8 +24,8 @@ export default function DashboardPage() {
     const fetchData = async () => {
       try {
         const [accounts, transactions] = await Promise.all([
-          apiCall('/accounts/', {}, token),
-          apiCall('/transactions/', {}, token),
+          apiCall('/accounts/', {}),
+          apiCall('/transactions/', {}),
         ]);
 
         const totalBalance = accounts.reduce((sum: number, acc: any) => sum + (acc.balance || 0), 0);
@@ -72,10 +70,8 @@ export default function DashboardPage() {
       }
     };
 
-    if (token) {
-      fetchData();
-    }
-  }, [token]);
+    fetchData();
+  }, []);
 
   if (isLoading) {
     return <div className="p-8">Loading dashboard...</div>;

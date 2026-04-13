@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuthStore } from '@/lib/authStore';
 import apiCall from '@/lib/api';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TransactionForm from '@/components/TransactionForm';
@@ -14,14 +13,13 @@ interface Account {
 }
 
 export default function TransactionsPage() {
-  const { token } = useAuthStore();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const data = await apiCall('/accounts/', {}, token);
+        const data = await apiCall('/accounts/', {});
         setAccounts(data);
       } catch (error) {
         console.error('Failed to fetch accounts:', error);
@@ -30,10 +28,8 @@ export default function TransactionsPage() {
       }
     };
 
-    if (token) {
-      fetchAccounts();
-    }
-  }, [token]);
+    fetchAccounts();
+  }, []);
 
   return (
     <div className="space-y-6">

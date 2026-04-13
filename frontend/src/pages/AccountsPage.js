@@ -2,17 +2,15 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/lib/authStore';
 import apiCall from '@/lib/api';
 import { toast } from 'sonner';
 export default function AccountsPage() {
-    const { token } = useAuthStore();
     const [accounts, setAccounts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
         const fetchAccounts = async () => {
             try {
-                const data = await apiCall('/accounts/', {}, token);
+                const data = await apiCall('/accounts/', {});
                 setAccounts(data);
             }
             catch (error) {
@@ -22,10 +20,8 @@ export default function AccountsPage() {
                 setIsLoading(false);
             }
         };
-        if (token) {
-            fetchAccounts();
-        }
-    }, [token]);
+        fetchAccounts();
+    }, []);
     if (isLoading) {
         return _jsx("div", { className: "text-center py-8", children: "Loading accounts..." });
     }

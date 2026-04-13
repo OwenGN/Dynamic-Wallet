@@ -1,6 +1,5 @@
 import { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '@/lib/authStore';
 import { Button } from '@/components/ui/button';
 
 interface LayoutProps {
@@ -10,7 +9,6 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuthStore();
 
   const navItems = [
     { label: 'Dashboard', path: '/dashboard', icon: '📊' },
@@ -18,11 +16,6 @@ export default function Layout({ children }: LayoutProps) {
     { label: 'Accounts', path: '/accounts', icon: '🏦' },
     { label: 'Goals', path: '/goals', icon: '🎯' },
   ];
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -56,16 +49,6 @@ export default function Layout({ children }: LayoutProps) {
             </button>
           ))}
         </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-white w-64">
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="w-full"
-          >
-            Logout
-          </Button>
-        </div>
       </aside>
 
       {/* Main Content */}

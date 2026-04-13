@@ -1,11 +1,9 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuthStore } from '@/lib/authStore';
 import apiCall from '@/lib/api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 export default function DashboardPage() {
-    const { token } = useAuthStore();
     const [stats, setStats] = useState({
         totalTransactions: 0,
         totalBalance: 0,
@@ -18,8 +16,8 @@ export default function DashboardPage() {
         const fetchData = async () => {
             try {
                 const [accounts, transactions] = await Promise.all([
-                    apiCall('/accounts/', {}, token),
-                    apiCall('/transactions/', {}, token),
+                    apiCall('/accounts/', {}),
+                    apiCall('/transactions/', {}),
                 ]);
                 const totalBalance = accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0);
                 const currentMonth = new Date().getMonth();
@@ -57,10 +55,8 @@ export default function DashboardPage() {
                 setIsLoading(false);
             }
         };
-        if (token) {
-            fetchData();
-        }
-    }, [token]);
+        fetchData();
+    }, []);
     if (isLoading) {
         return _jsx("div", { className: "p-8", children: "Loading dashboard..." });
     }

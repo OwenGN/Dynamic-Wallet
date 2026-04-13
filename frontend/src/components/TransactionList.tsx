@@ -1,5 +1,4 @@
 import React, { useEffect, useState, ChangeEvent } from 'react';
-import { useAuthStore } from '@/lib/authStore';
 import apiCall from '@/lib/api';
 
 interface Transaction {
@@ -22,7 +21,6 @@ interface Category {
 }
 
 export default function TransactionList() {
-  const { token } = useAuthStore();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -40,9 +38,9 @@ export default function TransactionList() {
     const fetchData = async () => {
       try {
         const [transRes, accRes, catRes] = await Promise.all([
-          apiCall('/transactions/', {}, token),
-          apiCall('/accounts/', {}, token),
-          apiCall('/categories/', {}, token),
+          apiCall('/transactions/', {}),
+          apiCall('/accounts/', {}),
+          apiCall('/categories/', {}),
         ]);
 
         setTransactions(transRes);
@@ -56,10 +54,8 @@ export default function TransactionList() {
       }
     };
 
-    if (token) {
-      fetchData();
-    }
-  }, [token]);
+    fetchData();
+  }, []);
 
   useEffect(() => {
     let filtered = transactions;

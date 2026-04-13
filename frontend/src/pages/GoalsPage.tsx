@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/lib/authStore';
 import apiCall from '@/lib/api';
 import { toast } from 'sonner';
 
@@ -15,14 +14,13 @@ interface Goal {
 }
 
 export default function GoalsPage() {
-  const { token } = useAuthStore();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchGoals = async () => {
       try {
-        const data = await apiCall('/goals/', {}, token);
+        const data = await apiCall('/goals/', {});
         setGoals(data);
       } catch (error) {
         toast.error('Failed to load goals');
@@ -31,10 +29,8 @@ export default function GoalsPage() {
       }
     };
 
-    if (token) {
-      fetchGoals();
-    }
-  }, [token]);
+    fetchGoals();
+  }, []);
 
   if (isLoading) {
     return <div className="text-center py-8">Loading goals...</div>;

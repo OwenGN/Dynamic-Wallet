@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { useAuthStore } from '@/lib/authStore';
 import apiCall from '@/lib/api';
 
 interface TransactionFormData {
@@ -16,7 +15,6 @@ interface TransactionFormData {
 }
 
 export default function TransactionForm() {
-  const { token } = useAuthStore();
   const [accounts, setAccounts] = useState<{ id: number; name: string }[]>([]);
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,8 +23,8 @@ export default function TransactionForm() {
     const fetchOptions = async () => {
       try {
         const [accountsRes, categoriesRes] = await Promise.all([
-          apiCall('/accounts/', {}, token),
-          apiCall('/categories/', {}, token),
+          apiCall('/accounts/', {}),
+          apiCall('/categories/', {}),
         ]);
         setAccounts(accountsRes);
         setCategories(categoriesRes);
@@ -34,10 +32,8 @@ export default function TransactionForm() {
         toast.error('Failed to load accounts and categories');
       }
     };
-    if (token) {
-      fetchOptions();
-    }
-  }, [token]);
+    fetchOptions();
+  }, []);
 
   const [formData, setFormData] = useState<TransactionFormData>({
     account_id: '',
@@ -67,8 +63,7 @@ export default function TransactionForm() {
             category_id: formData.category_id ? parseInt(formData.category_id) : null,
             account_id: parseInt(formData.account_id),
           }),
-        },
-        token
+        }
       );
 
       toast.success('Transaction added successfully!');

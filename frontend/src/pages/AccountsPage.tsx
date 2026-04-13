@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/lib/authStore';
 import apiCall from '@/lib/api';
 import { toast } from 'sonner';
 
@@ -13,14 +12,13 @@ interface Account {
 }
 
 export default function AccountsPage() {
-  const { token } = useAuthStore();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const data = await apiCall('/accounts/', {}, token);
+        const data = await apiCall('/accounts/', {});
         setAccounts(data);
       } catch (error) {
         toast.error('Failed to load accounts');
@@ -29,10 +27,8 @@ export default function AccountsPage() {
       }
     };
 
-    if (token) {
-      fetchAccounts();
-    }
-  }, [token]);
+    fetchAccounts();
+  }, []);
 
   if (isLoading) {
     return <div className="text-center py-8">Loading accounts...</div>;
