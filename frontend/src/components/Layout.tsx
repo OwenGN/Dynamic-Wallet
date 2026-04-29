@@ -61,7 +61,7 @@ export default function Layout({ children }: LayoutProps) {
         </header>
 
         {/* Content */}
-        <div className="flex-1 overflow-auto p-8">
+        <div className="flex-1 overflow-auto p-8 pl-16">
           {children}
         </div>
       </main>

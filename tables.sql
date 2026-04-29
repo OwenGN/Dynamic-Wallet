@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS Transactions(
     date DATE NOT NULL,
     amount REAL NOT NULL,
     category_id INTEGER REFERENCES Categories(id),
-    description TEXT
+    description TEXT,
+    goal_id INTEGER REFERENCES Goals(id)
 );
 CREATE TABLE IF NOT EXISTS Loans(
     id SERIAL PRIMARY KEY,
